@@ -1,4 +1,5 @@
 # Business Division and Environment Variables
+# environment/dev/
 variable "business_division" {
   description = "Business Division in the organization"
   type        = string
@@ -83,4 +84,22 @@ variable "repository_read_write_access_arns" {
 variable "repository_name" {
   description = "Name of the ECR repository"
   type        = string
+}
+
+variable "enable_container_insights" {
+  description = "Whether to enable CloudWatch Container Insights for the ECS cluster"
+  type        = bool
+  default     = true
+}
+
+variable "logs_retention_days" {
+  description = "Number of days to retain ECS logs in CloudWatch"
+  type        = number
+  default     = 30
+}
+
+variable "cluster_name" {
+  description = "Name of the ECS cluster"
+  type        = string
+  default     = "my-serverless-ecs-cluster"
 }

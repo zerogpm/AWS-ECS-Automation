@@ -27,11 +27,24 @@
 #   tags = local.common_tags
 # }
 
-module "ecr" {
-  source = "../../modules/ecr"
-  repository_name = var.repository_name  # This parameter is required according to your variables.tf
-  repository_read_write_access_arns = var.repository_read_write_access_arns
+# module "ecr" {
+#   source = "../../modules/ecr"
+#   repository_name = var.repository_name  # This parameter is required according to your variables.tf
+#   repository_read_write_access_arns = var.repository_read_write_access_arns
   
-  # Optionally add tags
-  tags = local.common_tags  # Assuming you have common_tags defined in locals
+#   # Optionally add tags
+#   tags = local.common_tags  # Assuming you have common_tags defined in locals
+# }
+
+# Call the ECS module
+module "ecs" {
+  source = "../../modules/ecs"
+  
+  # ECS cluster configuration
+  cluster_name = var.cluster_name
+  enable_container_insights = var.enable_container_insights
+  logs_retention_days = var.logs_retention_days
+  
+  # Pass the common tags from your local values
+  tags = local.common_tags
 }
