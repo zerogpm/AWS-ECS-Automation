@@ -2,13 +2,13 @@
 variable "business_division" {
   description = "Business Division in the organization"
   type        = string
-  default     = "sre"  # Default value for development environment
+  default     = "SRD"  # Default value for development environment
 }
 
 variable "environment" {
   description = "Environment Variable used as a prefix"
   type        = string
-  default     = "dev"  # This is the dev environment
+  default     = "DEV"  # This is the dev environment
 }
 
 # AWS Region
