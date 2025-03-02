@@ -10,17 +10,17 @@
 #   value       = module.ecr.repository_url
 # }
 
-output "ecs_cluster_name" {
-  description = "Name of the ECS cluster"
-  value       = module.ecs.ecs_cluster_name
-}
+# output "ecs_cluster_name" {
+#   description = "Name of the ECS cluster"
+#   value       = module.ecs.ecs_cluster_name
+# }
 
-output "ecs_cluster_arn" {
-  description = "ARN of the ECS cluster"
-  value       = module.ecs.ecs_cluster_arn
-}
+# output "ecs_cluster_arn" {
+#   description = "ARN of the ECS cluster"
+#   value       = module.ecs.ecs_cluster_arn
+# }
 
-output "ecs_cluster_id" {
-  description = "ID of the ECS cluster"
-  value       = module.ecs.ecs_cluster_id
-}
+# output "ecs_cluster_id" {
+#   description = "ID of the ECS cluster"
+#   value       = module.ecs.ecs_cluster_id
+# }

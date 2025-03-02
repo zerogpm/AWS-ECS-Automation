@@ -2,7 +2,7 @@
 module "ecr" {
   source = "terraform-aws-modules/ecr/aws"
 
-  repository_name = var.repository_name
+  repository_name                 = var.repository_name
   repository_image_tag_mutability = "MUTABLE"
 
   repository_read_write_access_arns = var.repository_read_write_access_arns
@@ -24,5 +24,5 @@ module "ecr" {
     ]
   })
 
-   tags = var.tags
+  tags = var.tags
 }

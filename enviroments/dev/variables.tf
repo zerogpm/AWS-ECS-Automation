@@ -1,15 +1,15 @@
 # Business Division and Environment Variables
-# environment/dev/
+# environment/dev/variables.tf
 variable "business_division" {
   description = "Business Division in the organization"
   type        = string
-  default     = "SRD"  # Default value for development environment
+  default     = "SRD" # Default value for development environment
 }
 
 variable "environment" {
   description = "Environment Variable used as a prefix"
   type        = string
-  default     = "DEV"  # This is the dev environment
+  default     = "DEV" # This is the dev environment
 }
 
 # AWS Region
@@ -102,4 +102,15 @@ variable "cluster_name" {
   description = "Name of the ECS cluster"
   type        = string
   default     = "my-serverless-ecs-cluster"
+}
+
+variable "image_name" {
+  description = "Name of the Docker image"
+  type        = string
+}
+
+variable "image_tag" {
+  description = "Tag for the Docker image"
+  type        = string
+  default     = "latest"
 }
