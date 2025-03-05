@@ -28,8 +28,17 @@ module "vpc" {
 }
 
 module "security" {
-  vpc_id = module.vpc.vpc_id
   source = "../../modules/security"
+  vpc_id = module.vpc.vpc_id
+  tags = local.common_tags
+}
+
+module "loadbalancer" {
+  source = "../../modules/alb"
+  vpc_id = module.vpc.vpc_id
+  subnets = module.vpc.public_subnets
+  security_groups = [module.security.loadbalancer_security_group_id]
+  depends_on = [module.vpc]
   tags = local.common_tags
 }
 
