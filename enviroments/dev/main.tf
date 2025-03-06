@@ -33,48 +33,55 @@ module "security" {
   tags   = local.common_tags
 }
 
-# module "loadbalancer" {
-#   source = "../../modules/alb"
-#   vpc_id = module.vpc.vpc_id
-#   subnets = module.vpc.public_subnets
-#   security_groups = [module.security.loadbalancer_security_group_id]
-#   depends_on = [module.vpc]
-#   tags = local.common_tags
-# }
+module "loadbalancer" {
+  source = "../../modules/alb"
+  vpc_id = module.vpc.vpc_id
+  subnets = module.vpc.public_subnets
+  security_groups = [module.security.loadbalancer_security_group_id]
+  depends_on = [module.vpc]
+  tags = local.common_tags
+}
 
-# module "ecr" {
-#   source                            = "../../modules/ecr"
-#   repository_name                   = var.repository_name # This parameter is required according to your variables.tf
-#   repository_read_write_access_arns = var.repository_read_write_access_arns
+module "ecr" {
+  source                            = "../../modules/ecr"
+  repository_name                   = var.repository_name # This parameter is required according to your variables.tf
+  repository_read_write_access_arns = var.repository_read_write_access_arns
 
-#   # Optionally add tags
-#   tags = local.common_tags # Assuming you have common_tags defined in locals
-# }
+  # Optionally add tags
+  tags = local.common_tags # Assuming you have common_tags defined in locals
+}
 
-# #Add Docker build and push module
-# module "docker_build" {
-#   source = "../../modules/docker"
+#Add Docker build and push module
+module "docker_build" {
+  source = "../../modules/docker"
 
-#   region                            = var.aws_region
-#   repository_read_write_access_arns = var.repository_read_write_access_arns
-#   repository_name                   = var.repository_name
-#   image_name                        = var.image_name
-#   image_tag                         = var.image_tag
-#   dockerfile_path                   = "${path.module}/../../react-app/Dockerfile.dev"
-#   docker_context_path               = "${path.module}/../../react-app"
+  region                            = var.aws_region
+  repository_read_write_access_arns = var.repository_read_write_access_arns
+  repository_name                   = var.repository_name
+  image_name                        = var.image_name
+  image_tag                         = var.image_tag
+  dockerfile_path                   = "${path.module}/../../react-app/Dockerfile.dev"
+  docker_context_path               = "${path.module}/../../react-app"
 
-#   depends_on = [module.ecr] # Ensure ECR repo exists first
-# }
+  depends_on = [module.ecr] # Ensure ECR repo exists first
+}
 
-# # Call the ECS module
-# module "ecs" {
-#   source = "../../modules/ecs"
+# Call the ECS module
+module "ecs" {
+  source = "../../modules/ecs"
 
-#   # ECS cluster configuration
-#   cluster_name              = var.cluster_name
-#   enable_container_insights = var.enable_container_insights
-#   logs_retention_days       = var.logs_retention_days
+  # ECS cluster configuration
+  cluster_name              = var.cluster_name
+  enable_container_insights = var.enable_container_insights
+  logs_retention_days       = var.logs_retention_days
 
-#   # Pass the common tags from your local values
-#   tags = local.common_tags
-# }
+  # Pass the common tags from your local values
+  tags = local.common_tags
+}
+
+module "ecs_task_definition" {
+  source = "../../modules/ecr/task-definition"
+  repository_read_write_access_arns = var.repository_read_write_access_arns
+  repository_name = var.repository_name
+  tags = local.common_tags
+}
