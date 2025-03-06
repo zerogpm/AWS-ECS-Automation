@@ -80,7 +80,7 @@ module "ecs" {
 }
 
 module "ecs_task_definition" {
-  source = "../../modules/ecr/task-definition"
+  source = "../../modules/ecs/task-definition"
   repository_read_write_access_arns = var.repository_read_write_access_arns
   repository_name = var.repository_name
   tags = local.common_tags

@@ -24,3 +24,18 @@ output "ecs_cluster_id" {
   description = "ID of the ECS cluster"
   value       = module.ecs.ecs_cluster_id
 }
+
+output "task_definition_arn" {
+  description = "The ARN of the task definition"
+  value       = module.ecs_task_definition.task_definition_arn
+}
+
+output "task_definition_family" {
+  description = "The family of the task definition"
+  value       = module.ecs_task_definition.task_definition_family
+}
+
+output "task_definition_revision" {
+  description = "The revision of the task definition"
+  value       = module.ecs_task_definition.task_definition_revision
+}
