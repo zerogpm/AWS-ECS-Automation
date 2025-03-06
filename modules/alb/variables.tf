@@ -17,7 +17,7 @@ variable "vpc_id" {
 
 variable "security_groups" {
   description = "Application Load Balancer security groups"
-  type        = list(string)  # Changed from string to list(string)
+  type        = list(string) # Changed from string to list(string)
 }
 
 variable "subnets" {

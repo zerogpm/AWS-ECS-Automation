@@ -5,11 +5,11 @@ module "alb" {
   version = "9.13.0"
 
   enable_deletion_protection = false
-  name               = "${var.name}-alb"
-  load_balancer_type = "application"
-  vpc_id             = var.vpc_id
-  subnets = var.subnets
-  security_groups = var.security_groups
+  name                       = "${var.name}-alb"
+  load_balancer_type         = "application"
+  vpc_id                     = var.vpc_id
+  subnets                    = var.subnets
+  security_groups            = var.security_groups
   # Listeners
 
   tags = var.tags # ALB Tags
