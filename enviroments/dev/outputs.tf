@@ -39,3 +39,8 @@ output "task_definition_revision" {
   description = "The revision of the task definition"
   value       = module.ecs_task_definition.task_definition_revision
 }
+
+output "alb_arn" {
+  description = "The revision of the task definition"
+  value       = module.loadbalancer.alb_arn
+}
