@@ -22,13 +22,13 @@ module "ecs_task_sg" {
   description = "Security Group with port 3000 open for entire Internet (IPv4 CIDR), egress ports are all world open"
   vpc_id      = var.vpc_id
   
-  ingress_with_cidr_blocks = [
+  # Only allow ingress from the ALB security group on port 3000
+  ingress_with_source_security_group_id = [
     {
-      from_port   = 3000
-      to_port     = 3000
-      protocol    = "tcp"
-      description = "Allow port 3000 from anywhere"
-      cidr_blocks = "0.0.0.0/0"
+      from_port                = 3000
+      to_port                  = 3000
+      protocol                 = "tcp"
+      description              = "Allow port 3000 from ALB only"
       source_security_group_id = module.loadbalancer_sg.security_group_id
     }
   ]

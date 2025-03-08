@@ -21,6 +21,12 @@ variable "subnets" {
   default     = []
 }
 
+variable "private_subnets" {
+  description = "service subnet"
+  type        = list(string)
+  default     = []
+}
+
 variable "ecs_task_security_group_id" {
   description = "service sg id"
   type        = string

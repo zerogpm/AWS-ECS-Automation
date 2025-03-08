@@ -72,9 +72,12 @@ resource "aws_ecs_service" "service" {
   }
 
   network_configuration {
-    subnets = var.subnets
-    security_groups = [var.ecs_task_security_group_id]
-    assign_public_ip = true
+    subnets          = var.private_subnets
+    security_groups  = [var.ecs_task_security_group_id]
+    # Change this to false if using private subnets with NAT gateway
+    # If you're using public subnets but want to prevent direct access,
+    # consider moving to private subnets with NAT gateway
+    assign_public_ip = false
   }
 
   depends_on = [aws_lb_listener.ecs_alb_listener]

@@ -93,7 +93,7 @@ module "ecs_service" {
   alb_arn = module.loadbalancer.alb_arn
   task_definition = module.ecs_task_definition.task_definition_arn
   ecs_task_security_group_id = module.security.ecs_task_security_group_id
-  subnets = module.vpc.public_subnets
+  private_subnets = module.vpc.private_subnets
   tags = local.common_tags
   depends_on = [module.ecs, module.ecs_task_definition]
 }
