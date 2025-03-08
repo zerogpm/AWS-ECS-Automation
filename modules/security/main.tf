@@ -29,6 +29,7 @@ module "ecs_task_sg" {
       protocol    = "tcp"
       description = "Allow port 3000 from anywhere"
       cidr_blocks = "0.0.0.0/0"
+      source_security_group_id = module.loadbalancer_sg.security_group_id
     }
   ]
 
