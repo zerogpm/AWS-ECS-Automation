@@ -74,9 +74,9 @@ resource "aws_ecs_service" "service" {
   network_configuration {
     subnets          = var.private_subnets
     security_groups  = [var.ecs_task_security_group_id]
-    # Change this to false if using private subnets with NAT gateway
     # If you're using public subnets but want to prevent direct access,
-    # consider moving to private subnets with NAT gateway
+    # consider moving to private subnets with NAT gateway which is what iam doing right now
+    # Change this to false if using private subnets with NAT gateway
     assign_public_ip = false
   }
 
