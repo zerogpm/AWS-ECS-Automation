@@ -25,22 +25,22 @@ output "ecs_cluster_id" {
   value       = module.ecs.ecs_cluster_id
 }
 
-output "task_definition_arn" {
-  description = "The ARN of the task definition"
-  value       = module.ecs_task_definition.task_definition_arn
-}
+# output "task_definition_arn" {
+#   description = "The ARN of the task definition"
+#   value       = module.ecs_task_definition.task_definition_arn
+# }
 
-output "task_definition_family" {
-  description = "The family of the task definition"
-  value       = module.ecs_task_definition.task_definition_family
-}
+# output "task_definition_family" {
+#   description = "The family of the task definition"
+#   value       = module.ecs_task_definition.task_definition_family
+# }
 
-output "task_definition_revision" {
-  description = "The revision of the task definition"
-  value       = module.ecs_task_definition.task_definition_revision
-}
+# output "task_definition_revision" {
+#   description = "The revision of the task definition"
+#   value       = module.ecs_task_definition.task_definition_revision
+# }
 
-output "alb_arn" {
-  description = "The revision of the task definition"
-  value       = module.loadbalancer.alb_arn
-}
+# output "alb_arn" {
+#   description = "The revision of the task definition"
+#   value       = module.loadbalancer.alb_arn
+# }

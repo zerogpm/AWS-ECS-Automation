@@ -15,3 +15,9 @@ variable "repository_name" {
   description = "repository name"
   type        = string
 }
+
+variable "image_tag" {
+  description = "Tag for the Docker image (e.g., latest)"
+  type        = string
+  default     = "latest"
+}

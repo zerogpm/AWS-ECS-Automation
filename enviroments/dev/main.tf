@@ -33,14 +33,14 @@ module "security" {
   tags   = local.common_tags
 }
 
-module "loadbalancer" {
-  source = "../../modules/alb"
-  vpc_id = module.vpc.vpc_id
-  subnets = module.vpc.public_subnets
-  security_groups = [module.security.loadbalancer_security_group_id]
-  depends_on = [module.vpc]
-  tags = local.common_tags
-}
+# module "loadbalancer" {
+#   source = "../../modules/alb"
+#   vpc_id = module.vpc.vpc_id
+#   subnets = module.vpc.public_subnets
+#   security_groups = [module.security.loadbalancer_security_group_id]
+#   depends_on = [module.vpc]
+#   tags = local.common_tags
+# }
 
 module "ecr" {
   source                            = "../../modules/ecr"
@@ -51,19 +51,31 @@ module "ecr" {
   tags = local.common_tags # Assuming you have common_tags defined in locals
 }
 
-#Add Docker build and push module
+# Then build and push the Docker images to the single repository with different tags
 module "docker_build" {
   source = "../../modules/docker"
-
-  region                            = var.aws_region
+  
+  region = var.aws_region
   repository_read_write_access_arns = var.repository_read_write_access_arns
-  repository_name                   = var.repository_name
-  image_name                        = var.image_name
-  image_tag                         = var.image_tag
-  dockerfile_path                   = "${path.module}/../../react-app/Dockerfile.dev"
-  docker_context_path               = "${path.module}/../../react-app"
-
-  depends_on = [module.ecr] # Ensure ECR repo exists first
+  repository_name = var.repository_name  # Use the same repository name
+  
+  docker_builds = {
+    "frontend" = {
+      image_name          = "frontend"
+      image_tag           = var.image_tag
+      dockerfile_path     = "${path.module}/../../app/client/Dockerfile"
+      docker_context_path = "${path.module}/../../app/client"
+    },
+    "backend" = {
+      image_name          = "backend"
+      image_tag           = var.image_tag
+      dockerfile_path     = "${path.module}/../../app/server/Dockerfile"
+      docker_context_path = "${path.module}/../../app/server"
+    }
+  }
+  
+  # This explicit dependency ensures ECR repository exists before Docker attempts to push
+  depends_on = [module.ecr]
 }
 
 # Call the ECS module
@@ -79,21 +91,44 @@ module "ecs" {
   tags = local.common_tags
 }
 
-module "ecs_task_definition" {
-  source = "../../modules/ecs/task-definition"
-  repository_read_write_access_arns = var.repository_read_write_access_arns
+# Frontend task definition
+module "frontend_task_definition" {
+  source = "../../modules/ecs/frontend-task-definition"
+  
   repository_name = var.repository_name
+  image_tag       = var.image_tag
+  
   tags = local.common_tags
 }
 
-module "ecs_service" {
-  source = "../../modules/ecs/service"
-  vpc_id = module.vpc.vpc_id
-  cluster = module.ecs.ecs_cluster_arn
-  alb_arn = module.loadbalancer.alb_arn
-  task_definition = module.ecs_task_definition.task_definition_arn
-  ecs_task_security_group_id = module.security.ecs_task_security_group_id
-  private_subnets = module.vpc.private_subnets
+# Backend task definition
+module "backend_task_definition" {
+  source = "../../modules/ecs/backend-task-definition"
+  
+  repository_name = var.repository_name
+  image_tag       = var.image_tag
+  
   tags = local.common_tags
-  depends_on = [module.ecs, module.ecs_task_definition]
 }
+
+
+# module "ecs_task_definition" {
+#   source = "../../modules/ecs/task-definition"
+  
+#   repository_read_write_access_arns = var.repository_read_write_access_arns
+#   repository_name = var.repository_name
+#   image_tag = var.image_tag
+#   tags = local.common_tags
+# }
+
+# module "ecs_service" {
+#   source = "../../modules/ecs/service"
+#   vpc_id = module.vpc.vpc_id
+#   cluster = module.ecs.ecs_cluster_arn
+#   alb_arn = module.loadbalancer.alb_arn
+#   task_definition = module.ecs_task_definition.task_definition_arn
+#   ecs_task_security_group_id = module.security.ecs_task_security_group_id
+#   private_subnets = module.vpc.private_subnets
+#   tags = local.common_tags
+#   depends_on = [module.ecs, module.ecs_task_definition]
+# }

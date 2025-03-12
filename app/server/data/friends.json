@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1",
+    "name": "Sarah",
+    "image": "https://i.pravatar.cc/48?u=1",
+    "balance": -7
+  },
+  {
+    "id": "2",
+    "name": "Michael",
+    "image": "https://i.pravatar.cc/48?u=2",
+    "balance": 20
+  },
+  {
+    "id": "3",
+    "name": "Jessica",
+    "image": "https://i.pravatar.cc/48?u=3",
+    "balance": 0
+  },
+  {
+    "id": "822e6c57-f8e5-4ce8-a72d-cff555bad1de",
+    "name": "tim",
+    "image": "https://i.pravatar.cc/48?u=822e6c57-f8e5-4ce8-a72d-cff555bad1de",
+    "balance": 0
+  }
+]

@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  server:
+    build: ./server
+    container_name: bill-splitter-server
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+    restart: unless-stopped
+
+  client:
+    build: ./client
+    container_name: bill-splitter-client
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - server
+    restart: unless-stopped

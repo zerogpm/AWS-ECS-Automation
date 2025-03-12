@@ -1,4 +1,4 @@
-#modules/docker/variables.tf
+# modules/docker/variables.tf
 variable "region" {
   description = "AWS region"
   type        = string
@@ -14,23 +14,12 @@ variable "repository_name" {
   type        = string
 }
 
-variable "image_name" {
-  description = "Name of the Docker image"
-  type        = string
-}
-
-variable "image_tag" {
-  description = "Tag for the Docker image"
-  type        = string
-  default     = "latest"
-}
-
-variable "dockerfile_path" {
-  description = "Path to the Dockerfile"
-  type        = string
-}
-
-variable "docker_context_path" {
-  description = "Path to the Docker build context"
-  type        = string
+variable "docker_builds" {
+  description = "Map of Docker builds to create"
+  type = map(object({
+    image_name          = string
+    image_tag           = string
+    dockerfile_path     = string
+    docker_context_path = string
+  }))
 }
