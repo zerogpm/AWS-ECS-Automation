@@ -33,15 +33,6 @@ module "security" {
   tags   = local.common_tags
 }
 
-# module "loadbalancer" {
-#   source = "../../modules/alb"
-#   vpc_id = module.vpc.vpc_id
-#   subnets = module.vpc.public_subnets
-#   security_groups = [module.security.loadbalancer_security_group_id]
-#   depends_on = [module.vpc]
-#   tags = local.common_tags
-# }
-
 module "loadbalancer" {
   source = "../../modules/alb"
   
@@ -208,15 +199,3 @@ resource "aws_iam_role_policy_attachment" "ecs_logging_policy_attachment" {
   role       = "ecsTaskExecutionRole"  # This is the exact name from your task definition
   policy_arn = aws_iam_policy.ecs_logging_policy.arn
 }
-
-# module "ecs_service" {
-#   source = "../../modules/ecs/service"
-#   vpc_id = module.vpc.vpc_id
-#   cluster = module.ecs.ecs_cluster_arn
-#   alb_arn = module.loadbalancer.alb_arn
-#   task_definition = module.ecs_task_definition.task_definition_arn
-#   ecs_task_security_group_id = module.security.ecs_task_security_group_id
-#   private_subnets = module.vpc.private_subnets
-#   tags = local.common_tags
-#   depends_on = [module.ecs, module.ecs_task_definition]
-# }
