@@ -1,4 +1,3 @@
-#modules/ecs/backend-task-definition/main.tf
 # modules/ecs/backend-task-definition/main.tf
 
 # Get current AWS account ID

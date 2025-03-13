@@ -1,43 +1,53 @@
-# modules/ecs/service/variables.tf
-variable "tags" {
-  description = "A map of tags to add to all resources"
-  type        = map(string)
-  default     = {}
-}
-
-variable "task_definition" {
-  description = "task definition arn"
+variable "name" {
+  description = "Name of the ECS service"
   type        = string
 }
 
 variable "cluster" {
-  description = "ecs cluster arn"
+  description = "ARN of the ECS cluster"
+  type        = string
+}
+
+variable "task_definition" {
+  description = "ARN of the ECS task definition"
+  type        = string
+}
+
+variable "container_name" {
+  description = "Name of the container in the task definition"
+  type        = string
+  default     = "app"  # Default value matching your original service
+}
+
+variable "container_port" {
+  description = "Port on which the container is listening"
+  type        = number
+  default     = 3000  # Default value matching your original service
+}
+
+variable "desired_count" {
+  description = "Number of instances of the task to place and keep running"
+  type        = number
+  default     = 1
+}
+
+variable "vpc_id" {
+  description = "ID of the VPC"
   type        = string
 }
 
 variable "subnets" {
-  description = "service subnet"
+  description = "List of subnet IDs to place the ECS tasks in"
   type        = list(string)
-  default     = []
 }
 
-variable "private_subnets" {
-  description = "service subnet"
+variable "security_groups" {
+  description = "List of security group IDs to assign to the ECS service"
   type        = list(string)
-  default     = []
 }
 
-variable "ecs_task_security_group_id" {
-  description = "service sg id"
-  type        = string
-}
-
-variable "vpc_id" {
-  description = "vpc id"
-  type        = string
-}
-
-variable "alb_arn" {
-  description = "ARN of the Application Load Balancer"
-  type        = string
+variable "tags" {
+  description = "A map of tags to add to all resources"
+  type        = map(string)
+  default     = {}
 }
