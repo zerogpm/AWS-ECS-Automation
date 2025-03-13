@@ -29,7 +29,15 @@ resource "aws_ecs_service" "service" {
     rollback = true
   }
   
-  # No load balancer configuration
+  # Load balancer configuration - only used if target_group_arn is provided
+  dynamic "load_balancer" {
+    for_each = var.target_group_arn != "" ? [1] : []
+    content {
+      target_group_arn = var.target_group_arn
+      container_name   = var.container_name
+      container_port   = var.container_port
+    }
+  }
   
   network_configuration {
     subnets          = var.subnets

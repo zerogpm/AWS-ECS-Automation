@@ -42,19 +42,19 @@ module "security" {
 #   tags = local.common_tags
 # }
 
-# Create the ALB with a frontend target group
-# module "loadbalancer" {
-#   source = "../../modules/alb"
+module "loadbalancer" {
+  source = "../../modules/alb"
   
-#   name   = "app"
-#   vpc_id = module.vpc.vpc_id
-#   subnets = module.vpc.public_subnets
-#   security_groups = [module.security.loadbalancer_security_group_id]
+  name   = "app"
+  vpc_id = module.vpc.vpc_id
+  subnets = module.vpc.public_subnets
+  security_groups = [module.security.loadbalancer_security_group_id]
+  health_check_path = "/"  # Health check path for the frontend service
   
-#   tags = local.common_tags
+  tags = local.common_tags
   
-#   depends_on = [module.vpc, module.security]
-# }
+  depends_on = [module.vpc, module.security]
+}
 
 module "ecr" {
   source                            = "../../modules/ecr"
@@ -141,12 +141,16 @@ module "frontend_service" {
   vpc_id          = module.vpc.vpc_id
   subnets         = module.vpc.private_subnets
   security_groups = [module.security.frontend_security_group_id]
+
+   # Add the ALB target group
+  target_group_arn = module.loadbalancer.frontend_target_group_arn
   
   tags = local.common_tags
   
   depends_on = [
     module.ecs,
-    module.frontend_task_definition
+    module.frontend_task_definition,
+    module.loadbalancer
   ]
 }
 

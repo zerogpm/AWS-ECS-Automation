@@ -1,5 +1,4 @@
-#environments/dev/
-
+# ECR Repository outputs
 output "ecr_repository_arn" {
   description = "ARN of the ECR repository"
   value       = module.ecr.repository_arn
@@ -10,6 +9,7 @@ output "ecr_repository_url" {
   value       = module.ecr.repository_url
 }
 
+# ECS Cluster outputs
 output "ecs_cluster_name" {
   description = "Name of the ECS cluster"
   value       = module.ecs.ecs_cluster_name
@@ -25,22 +25,40 @@ output "ecs_cluster_id" {
   value       = module.ecs.ecs_cluster_id
 }
 
-# output "task_definition_arn" {
-#   description = "The ARN of the task definition"
-#   value       = module.ecs_task_definition.task_definition_arn
-# }
+# Task definition outputs
+output "frontend_task_definition_arn" {
+  description = "The ARN of the frontend task definition"
+  value       = module.frontend_task_definition.task_definition_arn
+}
 
-# output "task_definition_family" {
-#   description = "The family of the task definition"
-#   value       = module.ecs_task_definition.task_definition_family
-# }
+output "backend_task_definition_arn" {
+  description = "The ARN of the backend task definition"
+  value       = module.backend_task_definition.task_definition_arn
+}
 
-# output "task_definition_revision" {
-#   description = "The revision of the task definition"
-#   value       = module.ecs_task_definition.task_definition_revision
-# }
+# ALB outputs
+output "alb_arn" {
+  description = "The ARN of the ALB"
+  value       = module.loadbalancer.alb_arn
+}
 
-# output "alb_arn" {
-#   description = "The revision of the task definition"
-#   value       = module.loadbalancer.alb_arn
-# }
+output "alb_dns_name" {
+  description = "The DNS name of the ALB"
+  value       = module.loadbalancer.alb_dns_name
+}
+
+output "frontend_target_group_arn" {
+  description = "The ARN of the frontend target group"
+  value       = module.loadbalancer.frontend_target_group_arn
+}
+
+# Service outputs
+output "frontend_service_name" {
+  description = "The name of the frontend ECS service"
+  value       = module.frontend_service.service_name
+}
+
+output "backend_service_name" {
+  description = "The name of the backend ECS service"
+  value       = module.backend_service.service_name
+}

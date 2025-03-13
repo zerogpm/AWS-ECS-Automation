@@ -46,6 +46,12 @@ variable "security_groups" {
   type        = list(string)
 }
 
+variable "target_group_arn" {
+  description = "ARN of the target group for the load balancer"
+  type        = string
+  default     = ""
+}
+
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)
