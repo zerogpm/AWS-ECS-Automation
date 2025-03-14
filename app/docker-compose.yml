@@ -15,7 +15,9 @@ services:
     restart: unless-stopped
 
   client:
-    build: ./client
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
     container_name: bill-splitter-client
     ports:
       - "3000:3000"
