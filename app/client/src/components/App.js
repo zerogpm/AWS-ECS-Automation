@@ -15,13 +15,18 @@ function App() {
       setError("");
 
       try {
-        const response = await fetch("http://localhost:5000/api/friends");
+        console.log("Fetching friends from API");
+
+        // Using relative URL - Nginx will proxy this to the backend
+        const response = await fetch("/api/friends");
+        console.log("Response status:", response.status);
 
         if (!response.ok) {
           throw new Error("Something went wrong with fetching friends");
         }
 
         const data = await response.json();
+        console.log("Response data:", data);
         setFriends(data);
       } catch (err) {
         console.error(err.message);
@@ -36,7 +41,8 @@ function App() {
 
   async function handleAddFriend(friend) {
     try {
-      const response = await fetch("http://localhost:5000/api/friends", {
+      // Using relative URL
+      const response = await fetch("/api/friends", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -58,16 +64,14 @@ function App() {
 
   async function handleSplitBill(value) {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/friends/${selectedFriend.id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ balance: selectedFriend.balance + value }),
-        }
-      );
+      // Using relative URL
+      const response = await fetch(`/api/friends/${selectedFriend.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ balance: selectedFriend.balance + value }),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to update balance");

@@ -12,6 +12,7 @@ resource "aws_ecs_task_definition" "backend_task" {
   memory                   = "2048"  # Backend usually needs more memory
   execution_role_arn       = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/ecsTaskExecutionRole"
   task_role_arn            = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/ecsTaskExecutionRole"
+  
 
   container_definitions = jsonencode([
     {

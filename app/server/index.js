@@ -7,8 +7,21 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: "*", // Or specify your frontend origin like 'http://your-frontend-domain'
+    credentials: false,
+    methods: ["GET", "POST", "PATCH"],
+  })
+);
 app.use(express.json());
+
+// Add logging middleware to help with debugging
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  console.log("Headers:", JSON.stringify(req.headers, null, 2));
+  next();
+});
 
 // Helper function to read friends data
 async function readFriendsData() {
@@ -42,9 +55,12 @@ async function writeFriendsData(friends) {
 // GET all friends
 app.get("/api/friends", async (req, res) => {
   try {
+    console.log("Received request for /api/friends");
     const friends = await readFriendsData();
+    console.log("Read friends data:", friends);
     res.json(friends);
   } catch (error) {
+    console.error("Error serving friends data:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
@@ -93,6 +109,11 @@ app.patch("/api/friends/:id", async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
+});
+
+// Add health check endpoint for ECS health checks
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
 });
 
 // Start the server

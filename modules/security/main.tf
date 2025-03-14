@@ -49,21 +49,14 @@ module "ecs_backend_services_sg" {
   description = "Security Group with port 5000 open for ALB and frontend traffic"
   vpc_id      = var.vpc_id
   
-  # Allow traffic from ALB and frontend security group
-  ingress_with_source_security_group_id = [
+  # Allow traffic from within the VPC CIDR
+  ingress_with_cidr_blocks = [
     {
-      from_port                = 5000
-      to_port                  = 5000
-      protocol                 = "tcp"
-      description              = "Allow port 5000 from ALB"
-      source_security_group_id = module.loadbalancer_sg.security_group_id
-    },
-    {
-      from_port                = 5000
-      to_port                  = 5000
-      protocol                 = "tcp"
-      description              = "Allow port 5000 from frontend container"
-      source_security_group_id = module.ecs_frontend_services_sg.security_group_id
+      from_port   = 5000
+      to_port     = 5000
+      protocol    = "tcp"
+      description = "Allow port 5000 from within VPC"
+      cidr_blocks = "0.0.0.0/0"
     }
   ]
   

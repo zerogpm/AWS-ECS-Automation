@@ -31,6 +31,7 @@ module "security" {
   source = "../../modules/security"
   vpc_id = module.vpc.vpc_id
   tags   = local.common_tags
+  vpc_cidr = var.vpc_cidr_block
 }
 
 module "loadbalancer" {
@@ -136,6 +137,16 @@ module "frontend_service" {
    # Add the ALB target group
   target_group_arn = module.loadbalancer.frontend_target_group_arn
   
+  # Service Discovery configuration
+  enable_service_discovery   = true
+
+  # Reuse the same namespace as backend (tip-project.local)
+  existing_namespace_id    = module.backend_service.namespace_id
+  create_namespace = false
+  service_discovery_name     = "frontend-service"
+  service_discovery_description = "Frontend web application"
+  dns_ttl                    = 15
+  
   tags = local.common_tags
   
   depends_on = [
@@ -162,7 +173,14 @@ module "backend_service" {
   subnets         = module.vpc.private_subnets
   security_groups = [module.security.backend_security_group_id]
   
-  # Add any other required parameters for your service module
+  # Service Discovery configuration
+  enable_service_discovery   = true
+  create_namespace           = true
+  namespace_name             = "tip-project.local"
+  namespace_description      = "Backend services"
+  service_discovery_name     = "backend-service"
+  service_discovery_description = "Namespace for new application"
+  dns_ttl                    = 15
   
   tags = local.common_tags
   
