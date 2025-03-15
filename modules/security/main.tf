@@ -49,15 +49,23 @@ module "ecs_backend_services_sg" {
   description = "Security Group with port 5000 open for ALB and frontend traffic"
   vpc_id      = var.vpc_id
   
-  # Allow traffic from within the VPC CIDR
-  ingress_with_cidr_blocks = [
+  # Allow traffic from frontend security group
+  ingress_with_source_security_group_id = [
     {
-      from_port   = 5000
-      to_port     = 5000
-      protocol    = "tcp"
-      description = "Allow port 5000 from within VPC"
-      cidr_blocks = "0.0.0.0/0"
+      from_port                = 5000
+      to_port                  = 5000
+      protocol                 = "tcp"
+      description              = "Allow port 5000 from frontend services"
+      source_security_group_id = module.ecs_frontend_services_sg.security_group_id
     }
+    # NOTE: If a other service is implemented in the future, add:
+    # {
+    #   from_port                = 5000
+    #   to_port                  = 5000
+    #   protocol                 = "tcp"
+    #   description              = "Allow port 5000 from message services"
+    #   source_security_group_id = module.message_service_sg.security_group_id
+    # }
   ]
   
   # Egress Rule - all-all open

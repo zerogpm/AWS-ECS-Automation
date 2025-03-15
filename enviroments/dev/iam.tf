@@ -17,8 +17,7 @@ resource "aws_iam_policy" "service_discovery_policy" {
           "route53:DeleteHealthCheck",
           "route53:GetHealthCheck",
           "route53:UpdateHealthCheck",
-          "route53:ChangeResourceRecordSets",
-          "route53:GetHealthCheck"
+          "route53:ChangeResourceRecordSets"
         ]
         Resource = "*"
       }
