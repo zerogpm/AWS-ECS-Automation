@@ -99,21 +99,25 @@ module "ecs" {
 
 # Frontend task definition
 module "frontend_task_definition" {
-  source = "../../modules/ecs/frontend-task-definition"
-  
+  source = "../../modules/ecs/task-definition"
   repository_name = var.repository_name
   image_tag       = var.image_tag
-  
+  name = "frontend"
+  port = 3000
+  cpu = "512"
+  memory = "1024"
   tags = local.common_tags
 }
 
 # Backend task definition
 module "backend_task_definition" {
-  source = "../../modules/ecs/backend-task-definition"
-  
+  source = "../../modules/ecs/task-definition"
   repository_name = var.repository_name
   image_tag       = var.image_tag
-  
+  name = "backend"
+  port = 5000
+  cpu = "512"
+  memory = "2048"
   tags = local.common_tags
 }
 

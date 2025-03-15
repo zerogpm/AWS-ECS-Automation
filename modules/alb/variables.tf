@@ -1,3 +1,5 @@
+# modules/alb/variables.tf
+
 variable "name" {
   description = "Application Load Balancer Name"
   type        = string
