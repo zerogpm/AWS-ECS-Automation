@@ -48,6 +48,28 @@ resource "aws_iam_policy" "ecs_ssm_policy" {
   })
 }
 
+# IAM policy for ECS logging
+resource "aws_iam_policy" "ecs_logging_policy" {
+  name        = "ecs-logging-policy"
+  description = "Allow ECS tasks to create and write to CloudWatch log groups"
+  
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogStreams"
+        ],
+        Resource = "arn:aws:logs:*:*:*"
+      }
+    ]
+  })
+}
+
 # Get a reference to the existing role
 data "aws_iam_role" "ecs_task_execution_role" {
   name = "ecsTaskExecutionRole"
@@ -61,6 +83,12 @@ resource "aws_iam_role_policy_attachment" "service_discovery_policy_attachment" 
 
 # Attach the SSM Managed Instance Core policy for comprehensive SSM capabilities
 resource "aws_iam_role_policy_attachment" "ssm_managed_instance_core" {
-  role       = "ecsTaskExecutionRole"
+  role       = data.aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+# Attach the policy to the ECS task execution role
+resource "aws_iam_role_policy_attachment" "ecs_logging_policy_attachment" {
+  role       = data.aws_iam_role.ecs_task_execution_role.name
+  policy_arn = aws_iam_policy.ecs_logging_policy.arn
 }
