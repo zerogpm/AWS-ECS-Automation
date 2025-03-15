@@ -95,7 +95,7 @@ variable "enable_container_insights" {
 variable "logs_retention_days" {
   description = "Number of days to retain ECS logs in CloudWatch"
   type        = number
-  default     = 30
+  default     = 1
 }
 
 variable "cluster_name" {
