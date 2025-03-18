@@ -8,7 +8,7 @@ locals {
 
 resource "null_resource" "docker_build_push" {
   for_each = var.docker_builds
-  
+
   triggers = {
     # Always force a rebuild for testing
     always_run = "${timestamp()}"

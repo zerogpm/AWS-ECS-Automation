@@ -1,7 +1,7 @@
-# Create a new IAM policy
-resource "aws_iam_policy" "service_discovery_policy" {
-  name        = "EcsServiceDiscoveryPolicy"
-  description = "Policy to allow ECS tasks to use Service Discovery"
+# Create a new IAM policy for Service Connect
+resource "aws_iam_policy" "service_connect_policy" {
+  name        = "EcsServiceConnectPolicy"
+  description = "Policy to allow ECS tasks to use Service Connect"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -9,15 +9,9 @@ resource "aws_iam_policy" "service_discovery_policy" {
       {
         Effect = "Allow"
         Action = [
-          "servicediscovery:RegisterInstance",
-          "servicediscovery:DeregisterInstance",
           "servicediscovery:DiscoverInstances",
-          "servicediscovery:GetInstancesHealthStatus",
-          "route53:CreateHealthCheck",
-          "route53:DeleteHealthCheck",
-          "route53:GetHealthCheck",
-          "route53:UpdateHealthCheck",
-          "route53:ChangeResourceRecordSets"
+          "servicediscovery:ListNamespaces",
+          "servicediscovery:ListServices"
         ]
         Resource = "*"
       }
@@ -29,7 +23,7 @@ resource "aws_iam_policy" "service_discovery_policy" {
 resource "aws_iam_policy" "ecs_ssm_policy" {
   name        = "ecs-ssm-execute-command-policy"
   description = "Allow ECS tasks to use SSM for Execute Command"
-  
+
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -51,7 +45,7 @@ resource "aws_iam_policy" "ecs_ssm_policy" {
 resource "aws_iam_policy" "ecs_logging_policy" {
   name        = "ecs-logging-policy"
   description = "Allow ECS tasks to create and write to CloudWatch log groups"
-  
+
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -74,10 +68,16 @@ data "aws_iam_role" "ecs_task_execution_role" {
   name = "ecsTaskExecutionRole"
 }
 
-# Attach the policy to the existing role
-resource "aws_iam_role_policy_attachment" "service_discovery_policy_attachment" {
+# Attach the Service Connect policy to the existing role
+resource "aws_iam_role_policy_attachment" "service_connect_policy_attachment" {
   role       = data.aws_iam_role.ecs_task_execution_role.name
-  policy_arn = aws_iam_policy.service_discovery_policy.arn
+  policy_arn = aws_iam_policy.service_connect_policy.arn
+}
+
+# Attach the SSM policy for Execute Command
+resource "aws_iam_role_policy_attachment" "ecs_ssm_policy_attachment" {
+  role       = data.aws_iam_role.ecs_task_execution_role.name
+  policy_arn = aws_iam_policy.ecs_ssm_policy.arn
 }
 
 # Attach the SSM Managed Instance Core policy for comprehensive SSM capabilities
@@ -86,7 +86,7 @@ resource "aws_iam_role_policy_attachment" "ssm_managed_instance_core" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-# Attach the policy to the ECS task execution role
+# Attach the logging policy to the ECS task execution role
 resource "aws_iam_role_policy_attachment" "ecs_logging_policy_attachment" {
   role       = data.aws_iam_role.ecs_task_execution_role.name
   policy_arn = aws_iam_policy.ecs_logging_policy.arn

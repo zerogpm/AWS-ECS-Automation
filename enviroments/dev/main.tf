@@ -28,23 +28,23 @@ module "vpc" {
 }
 
 module "security" {
-  source = "../../modules/security"
-  vpc_id = module.vpc.vpc_id
-  tags   = local.common_tags
+  source   = "../../modules/security"
+  vpc_id   = module.vpc.vpc_id
+  tags     = local.common_tags
   vpc_cidr = var.vpc_cidr_block
 }
 
 module "loadbalancer" {
   source = "../../modules/alb"
-  
-  name   = "app"
-  vpc_id = module.vpc.vpc_id
-  subnets = module.vpc.public_subnets
-  security_groups = [module.security.loadbalancer_security_group_id]
-  health_check_path = "/"  # Health check path for the frontend service
-  
+
+  name              = "app"
+  vpc_id            = module.vpc.vpc_id
+  subnets           = module.vpc.public_subnets
+  security_groups   = [module.security.loadbalancer_security_group_id]
+  health_check_path = "/" # Health check path for the frontend service
+
   tags = local.common_tags
-  
+
   depends_on = [module.vpc, module.security]
 }
 
@@ -60,11 +60,11 @@ module "ecr" {
 # Then build and push the Docker images to the single repository with different tags
 module "docker_build" {
   source = "../../modules/docker"
-  
-  region = var.aws_region
+
+  region                            = var.aws_region
   repository_read_write_access_arns = var.repository_read_write_access_arns
-  repository_name = var.repository_name  # Use the same repository name
-  
+  repository_name                   = var.repository_name # Use the same repository name
+
   docker_builds = {
     "frontend" = {
       image_name          = "frontend"
@@ -79,7 +79,7 @@ module "docker_build" {
       docker_context_path = "${path.module}/../../app/server"
     }
   }
-  
+
   # This explicit dependency ensures ECR repository exists before Docker attempts to push
   depends_on = [module.ecr]
 }
@@ -99,95 +99,93 @@ module "ecs" {
 
 # Frontend task definition
 module "frontend_task_definition" {
-  source = "../../modules/ecs/task-definition"
+  source          = "../../modules/ecs/task-definition"
   repository_name = var.repository_name
   image_tag       = var.image_tag
-  name = "frontend"
-  port = 3000
-  cpu = "512"
-  memory = "1024"
-  tags = local.common_tags
+  name            = "frontend"
+  port            = 3000
+  cpu             = "512"
+  memory          = "1024"
+  tags            = local.common_tags
 }
 
 # Backend task definition
 module "backend_task_definition" {
-  source = "../../modules/ecs/task-definition"
+  source          = "../../modules/ecs/task-definition"
   repository_name = var.repository_name
   image_tag       = var.image_tag
-  name = "backend"
-  port = 5000
-  cpu = "512"
-  memory = "2048"
+  name            = "backend"
+  port            = 5000
+  cpu             = "512"
+  memory          = "2048"
+  tags            = local.common_tags
+}
+
+# Create a Service Connect namespace separately
+resource "aws_service_discovery_http_namespace" "service_connect" {
+  name        = "tip-project"
+  description = "Service Connect namespace for all services"
+
   tags = local.common_tags
 }
 
 # Frontend ECS Service
 module "frontend_service" {
   source = "../../modules/ecs/service"
-  
+
   name            = "frontend"
   cluster         = module.ecs.ecs_cluster_arn
   task_definition = module.frontend_task_definition.task_definition_arn
-  
+
   # Container configuration - override the default settings
-  container_name  = "frontend"  # Must match name in your task definition
-  container_port  = 3000
-  
+  container_name = "frontend" # Must match name in your task definition
+  container_port = 3000
+
   # Network configuration
   vpc_id          = module.vpc.vpc_id
   subnets         = module.vpc.private_subnets
   security_groups = [module.security.frontend_security_group_id]
 
-   # Add the ALB target group
+  # Add the ALB target group
   target_group_arn = module.loadbalancer.frontend_target_group_arn
-  
-  # Service Discovery configuration
-  enable_service_discovery   = true
 
-  # Reuse the same namespace as backend (tip-project.local)
-  existing_namespace_id    = module.backend_service.namespace_id
-  create_namespace = false
-  service_discovery_name     = "frontend-service"
-  service_discovery_description = "Frontend web application"
-  dns_ttl                    = 15
-  
+  # Service Connect configuration
+  enable_service_connect    = true
+  service_connect_namespace = aws_service_discovery_http_namespace.service_connect.arn
+
   tags = local.common_tags
-  
+
   depends_on = [
     module.ecs,
     module.frontend_task_definition,
-    module.loadbalancer
+    module.loadbalancer,
+    module.backend_service
   ]
 }
 
 # Backend ECS Service
 module "backend_service" {
   source = "../../modules/ecs/service"
-  
+
   name            = "backend"
   cluster         = module.ecs.ecs_cluster_arn
   task_definition = module.backend_task_definition.task_definition_arn
-  
+
   # Container configuration - override the default settings
-  container_name  = "backend"  # Must match name in your task definition
-  container_port  = 5000
-  
+  container_name = "backend" # Must match name in your task definition
+  container_port = 5000
+
   # Network configuration
   vpc_id          = module.vpc.vpc_id
   subnets         = module.vpc.private_subnets
   security_groups = [module.security.backend_security_group_id]
-  
-  # Service Discovery configuration
-  enable_service_discovery   = true
-  create_namespace           = true
-  namespace_name             = "tip-project.local"
-  namespace_description      = "Backend services"
-  service_discovery_name     = "backend-service"
-  service_discovery_description = "Namespace for new application"
-  dns_ttl                    = 15
-  
+
+  # Service Connect configuration
+  enable_service_connect    = true
+  service_connect_namespace = aws_service_discovery_http_namespace.service_connect.arn
+
   tags = local.common_tags
-  
+
   depends_on = [
     module.ecs,
     module.backend_task_definition

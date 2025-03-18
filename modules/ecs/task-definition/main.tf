@@ -9,15 +9,15 @@ resource "aws_cloudwatch_log_group" "tip_log_group" {
   retention_in_days = 1
 
   # This helps handle the case where the resource already exists
-  lifecycle {   
+  lifecycle {
     # Create new resource before destroying the old one
     create_before_destroy = true
   }
-  
+
   tags = var.tags
 }
 
-# ECS Task Definition for Frontend
+# ECS Task Definition
 resource "aws_ecs_task_definition" "tip_task_definition" {
   family                   = "tip-${var.name}"
   requires_compatibilities = ["FARGATE"]

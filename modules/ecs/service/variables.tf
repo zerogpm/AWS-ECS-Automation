@@ -16,13 +16,13 @@ variable "task_definition" {
 variable "container_name" {
   description = "Name of the container in the task definition"
   type        = string
-  default     = "app"  # Default value matching your original service
+  default     = "app"
 }
 
 variable "container_port" {
   description = "Port on which the container is listening"
   type        = number
-  default     = 3000  # Default value matching your original service
+  default     = 3000
 }
 
 variable "desired_count" {
@@ -52,54 +52,23 @@ variable "target_group_arn" {
   default     = ""
 }
 
-# Service Discovery variables
-variable "enable_service_discovery" {
-  description = "Whether to enable service discovery for the service"
+# Service Connect variables
+variable "enable_service_connect" {
+  description = "Whether to enable Service Connect for the service"
   type        = bool
   default     = false
 }
 
-variable "create_namespace" {
-  description = "Whether to create a new namespace for service discovery"
+variable "service_connect_namespace" {
+  description = "ARN of the Service Connect namespace"
+  type        = string
+  default     = ""
+}
+
+variable "service_connect_as_client_only" {
+  description = "If true, the service will only act as a client in Service Connect (not discoverable)"
   type        = bool
   default     = false
-}
-
-variable "namespace_name" {
-  description = "Name of the Cloud Map namespace to create or use"
-  type        = string
-  default     = ""
-}
-
-variable "namespace_description" {
-  description = "Description for the Cloud Map namespace"
-  type        = string
-  default     = ""
-}
-
-variable "existing_namespace_id" {
-  description = "ID of an existing Cloud Map namespace to use (if not creating a new one)"
-  type        = string
-  default     = ""
-}
-
-
-variable "service_discovery_name" {
-  description = "Name for the service discovery service"
-  type        = string
-  default     = ""
-}
-
-variable "service_discovery_description" {
-  description = "Description for the service discovery service"
-  type        = string
-  default     = ""
-}
-
-variable "dns_ttl" {
-  description = "TTL for DNS records"
-  type        = number
-  default     = 15
 }
 
 variable "tags" {

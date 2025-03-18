@@ -1,16 +1,13 @@
 FROM node:20-alpine
 
-# Install curl for debugging
 RUN apk add --no-cache curl
 
 WORKDIR /app
 
-COPY package.json .
-
-RUN npm install
-
 COPY . .
+
+RUN npm install --omit=dev
 
 EXPOSE 5000
 
-CMD ["npm", "run", "dev"]
+CMD ["npm", "start"]

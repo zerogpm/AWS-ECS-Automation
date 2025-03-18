@@ -5,7 +5,7 @@ output "ecr_repository_arn" {
 }
 
 output "ecr_repository_url" {
-  description = "URL of the ECR repository" 
+  description = "URL of the ECR repository"
   value       = module.ecr.repository_url
 }
 
@@ -61,4 +61,9 @@ output "frontend_service_name" {
 output "backend_service_name" {
   description = "The name of the backend ECS service"
   value       = module.backend_service.service_name
+}
+
+output "backend_service_endpoint" {
+  description = "The Service Connect endpoint for the backend service"
+  value       = "${module.backend_service.service_name}.${aws_service_discovery_http_namespace.service_connect.name}"
 }
