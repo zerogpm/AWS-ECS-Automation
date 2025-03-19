@@ -137,6 +137,9 @@ module "frontend_service" {
   cluster         = module.ecs.ecs_cluster_arn
   task_definition = module.frontend_task_definition.task_definition_arn
 
+  # Set the desired count to min_capacity - will be managed by autoscaling
+  desired_count = 2
+
   # Container configuration - override the default settings
   container_name = "frontend" # Must match name in your task definition
   container_port = 3000
@@ -163,6 +166,44 @@ module "frontend_service" {
   ]
 }
 
+# Frontend Autoscaling using ALB request count scaling
+module "frontend_autoscaling" {
+  source = "../../modules/autoscaling"
+
+  name                = "frontend"
+  cluster_name        = module.ecs.ecs_cluster_name
+  service_name        = module.frontend_service.service_name
+  execution_role_name = "ecsTaskExecutionRole" # Using your existing IAM role
+
+  # Scaling configuration
+  min_capacity = 2
+  max_capacity = 10
+
+  # ALB request-based scaling (suitable for frontend services)
+  enable_alb_request_scaling = true
+  target_request_count       = 500 # Scale out when 500 requests per task is reached
+
+  # Disable CPU-based scaling for frontend
+  enable_cpu_scaling = false
+
+  # Disable memory-based scaling for frontend
+  enable_memory_scaling = false
+
+  # Cooldown periods to prevent thrashing
+  scale_in_cooldown  = 300 # 5 minutes cooldown before scaling in
+  scale_out_cooldown = 60  # 1 minute cooldown before scaling out
+
+  # ALB resource identifiers needed for the scaling metric
+  alb_arn_suffix          = module.loadbalancer.lb_arn_suffix
+  target_group_arn_suffix = module.loadbalancer.frontend_target_group_arn_suffix
+
+  tags = local.common_tags
+
+  depends_on = [
+    module.frontend_service
+  ]
+}
+
 # Backend ECS Service
 module "backend_service" {
   source = "../../modules/ecs/service"
@@ -170,6 +211,9 @@ module "backend_service" {
   name            = "backend"
   cluster         = module.ecs.ecs_cluster_arn
   task_definition = module.backend_task_definition.task_definition_arn
+
+  # Set the desired count to min_capacity - will be managed by autoscaling
+  desired_count = 2
 
   # Container configuration - override the default settings
   container_name = "backend" # Must match name in your task definition
@@ -189,5 +233,40 @@ module "backend_service" {
   depends_on = [
     module.ecs,
     module.backend_task_definition
+  ]
+}
+
+# Backend Autoscaling with CPU and memory-based scaling
+module "backend_autoscaling" {
+  source = "../../modules/autoscaling"
+
+  name                = "backend"
+  cluster_name        = module.ecs.ecs_cluster_name
+  service_name        = module.backend_service.service_name
+  execution_role_name = "ecsTaskExecutionRole" # Using your existing IAM role
+
+  # Scaling configuration
+  min_capacity = 2
+  max_capacity = 8
+
+  # Disable ALB request-based scaling for backend
+  enable_alb_request_scaling = false
+
+  # Enable CPU-based scaling for backend
+  enable_cpu_scaling     = true
+  target_cpu_utilization = 65 # Scale when CPU utilization reaches 65%
+
+  # Since backend might have longer processing times, use longer cooldowns
+  scale_in_cooldown  = 600 # 10 minutes cooldown before scaling in
+  scale_out_cooldown = 120 # 2 minutes cooldown before scaling out
+
+  # Enable memory-based scaling as well (as a secondary scaling mechanism)
+  enable_memory_scaling     = true
+  target_memory_utilization = 75 # Scale when memory utilization reaches 75%
+
+  tags = local.common_tags
+
+  depends_on = [
+    module.backend_service
   ]
 }

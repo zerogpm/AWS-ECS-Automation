@@ -41,6 +41,27 @@ resource "aws_iam_policy" "ecs_ssm_policy" {
   })
 }
 
+# IAM policy for ECS autoscaling
+resource "aws_iam_policy" "ecs_autoscaling_policy" {
+  name        = "ecs-autoscaling-policy"
+  description = "Allow Application Auto Scaling to manage ECS services"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "ecs:DescribeServices",
+          "ecs:UpdateService"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+
 # IAM policy for ECS logging
 resource "aws_iam_policy" "ecs_logging_policy" {
   name        = "ecs-logging-policy"
@@ -90,4 +111,10 @@ resource "aws_iam_role_policy_attachment" "ssm_managed_instance_core" {
 resource "aws_iam_role_policy_attachment" "ecs_logging_policy_attachment" {
   role       = data.aws_iam_role.ecs_task_execution_role.name
   policy_arn = aws_iam_policy.ecs_logging_policy.arn
+}
+
+# Attach the autoscaling policy to the ECS task execution role
+resource "aws_iam_role_policy_attachment" "ecs_autoscaling_policy_attachment" {
+  role       = data.aws_iam_role.ecs_task_execution_role.name
+  policy_arn = aws_iam_policy.ecs_autoscaling_policy.arn
 }
